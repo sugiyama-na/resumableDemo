@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Resumable.js - Multiple simultaneous, stable and resumable uploads via the HTML5 File API</title>
+  <meta charset="utf-8" />
+  <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+
+<body>
+<form action="http://localhost:3000/upload" name="form1" onsubmit="onSubmit">
+  <label>お名前</label><br>
+  <input type="name" name="name" value="杉山" placeholder="苗字 名前"><br>
+  <label>メールアドレス</label><br>
+  <input type="email" name="email-address" value="natsuki@fork.co.jp" placeholder="xxxx@example.com"><br>
+  <a href="#" id="browseButton">Select files</a>
+  <button type="submit" id="browseUploadButton" onclick="r.upload();">送信</button>
+</form>
+
+<script src="resumable.js"></script>
+<script>
+  var r = new Resumable({
+    target: 'http://localhost:3000/upload',
+    chunkSize: 1 * 1024 *100,
+    simultaneousUploads: 4,
+    testChunks: false,
+    throttleProgressCallbacks: 1
+  });
+
+
+r.assignBrowse(document.getElementById('browseButton'));
+
+r.on('fileSuccess', function(file){
+    console.debug('fileSuccess',file);
+  });
+r.on('fileProgress', function(file){
+    console.debug('fileProgress', file);
+  });
+r.on('fileAdded', function(file, event){
+    console.debug('fileAdded', event);
+  });
+r.on('filesAdded', function(array){
+    console.debug('filesAdded', array);
+  });
+r.on('fileRetry', function(file){
+    console.debug('fileRetry', file);
+  });
+r.on('fileError', function(file, message){
+    console.debug('fileError', file, message);
+  });
+r.on('uploadStart', function(){
+    r.pause()
+    console.debug('uploadStart');
+  });
+r.on('complete', function(){
+    console.debug('complete');
+  });
+r.on('progress', function(){
+    console.debug('progress');
+  });
+r.on('error', function(message, file){
+    console.debug('error', message, file);
+  });
+r.on('pause', function(){
+    console.debug('pause');
+  });
+r.on('cancel', function(){
+    console.debug('cancel');
+  });
+
+function onSubmit() {
+  console.log('submitted')
+}
+</script>
+</body>
+</html>
